@@ -61,7 +61,7 @@ Responsável pelo desenvolvimento de:
 - Operação de depósito.
 
 ### Integrante 2 — Piloto/Navegador
-**Nome do integrante**
+**Bernado Sena**
 
 Responsável pelo desenvolvimento de:
 
