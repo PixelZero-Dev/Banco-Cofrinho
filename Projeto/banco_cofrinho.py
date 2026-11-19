@@ -1,0 +1,174 @@
+# ==============================================================================
+# ATIVIDADE EM DUPLA - BANCO COFRINHO (NovaByte Sistemas - Chamado #BC-001 e #BC-002)
+# Integrante 1 (Piloto): [Rafael Sales] - Funções: Senha, Menu, Saldo e Depósito
+# Integrante 2 (Navegador): [Bernando Sena] - Funções: Saque, Extrato e Main
+# ==============================================================================
+
+import os
+
+
+def limpar_tela():
+    os.system("cls" if os.name == "nt" else "clear")
+
+
+def pausar():
+    input("\nPressione Enter para continuar...")
+
+
+# ------------------------------------------------------------------------------
+# 01. FUNÇÕES
+# ------------------------------------------------------------------------------
+
+
+def verificar_senha():
+    """EXTRA 1: Pede uma senha antes de abrir o menu, com no máximo 3 tentativas."""
+    senha_correta = "1234"
+    tentativas = 0
+
+    while tentativas < 3:
+        limpar_tela()
+        print("=== BANCO COFRINHO · ACESSO RESTRITO ===")
+        senha = input(f"Digite sua senha ({3 - tentativas} tentativa(s) restante(s)): ")
+
+        if senha == senha_correta:
+            print("\nAcesso liberado! Bem-vindo(a) ao Banco Cofrinho.")
+            pausar()
+            return True
+        else:
+            tentativas += 1
+            if tentativas < 3:
+                print("\nSenha incorreta! Tente novamente.")
+                pausar()
+
+    print("\nNúmero máximo de tentativas excedido. Acesso bloqueado!")
+    return False
+
+
+def mostrar_menu():
+    """Função sem retorno: exibe o menu principal do caixa eletrônico."""
+    print("=== BANCO COFRINHO · CAIXA ===")
+    print("1 - Ver saldo")
+    print("2 - Depositar")
+    print("3 - Sacar")
+    print("4 - Ver extrato")
+    print("0 - Sair")
+
+
+def mostrar_saldo(saldo):
+    """Função sem retorno: recebe o saldo e mostra em reais com 2 casas decimais."""
+    print(f"\nSaldo atual: R$ {saldo:.2f}")
+
+
+def depositar(saldo, extrato):
+    """Função com retorno: valida o valor, registra no extrato e devolve o novo saldo."""
+    try:
+        valor = float(input("\nInforme o valor para depósito: R$ "))
+    except ValueError:
+        print("Operação recusada: digite apenas números válidos.")
+        return saldo
+
+    if valor <= 0:
+        print("Operação recusada: o valor do depósito deve ser maior que zero.")
+        return saldo
+
+    saldo += valor
+    extrato.append(f"Depósito: R$ {valor:.2f}")
+    print(f"Depósito de R$ {valor:.2f} realizado com sucesso!")
+    return saldo
+
+
+def sacar(saldo, extrato):
+    """Função com retorno + EXTRA 2: valida valor, limite de R$ 1.000,00 e saldo suficiente."""
+    try:
+        valor = float(input("\nInforme o valor para saque: R$ "))
+    except ValueError:
+        print("Operação recusada: digite apenas números válidos.")
+        return saldo
+
+    if valor <= 0:
+        print("Operação recusada: valor inválido (deve ser maior que zero).")
+        return saldo
+
+    # EXTRA 2: Limite por saque
+    if valor > 1000.00:
+        print("Operação recusada: o limite máximo por saque é de R$ 1.000,00.")
+        return saldo
+
+    if valor > saldo:
+        print("Operação recusada: saldo insuficiente.")
+        return saldo
+
+    saldo -= valor
+    extrato.append(f"Saque: R$ {valor:.2f}")
+    print(f"Saque de R$ {valor:.2f} realizado com sucesso!")
+    return saldo
+
+
+def mostrar_extrato(extrato, saldo):
+    """Função sem retorno + EXTRA 3: mostra movimentações, saldo e resumo de operações."""
+    print("\n=== EXTRATO BANCÁRIO ===")
+    qtd_depositos = 0
+    qtd_saques = 0
+
+    if len(extrato) == 0:
+        print("Nenhuma movimentação.")
+    else:
+        for movimentacao in extrato:
+            print(movimentacao)
+            # Contagem para o EXTRA 3
+            if movimentacao.startswith("Depósito"):
+                qtd_depositos += 1
+            elif movimentacao.startswith("Saque"):
+                qtd_saques += 1
+
+    print("-" * 24)
+    print(f"Saldo atual: R$ {saldo:.2f}")
+    # EXTRA 3: Resumo do extrato
+    print(f"Resumo: {qtd_depositos} depósito(s) e {qtd_saques} saque(s) realizado(s).")
+
+
+# ------------------------------------------------------------------------------
+# 02. DADOS INICIAIS
+# ------------------------------------------------------------------------------
+saldo = 500.00
+extrato = []
+opcao = -1
+
+# ------------------------------------------------------------------------------
+# 03. LAÇO DO MENU (Inicia apenas se passar pela senha do EXTRA 1)
+# ------------------------------------------------------------------------------
+if verificar_senha():
+    while opcao != 0:
+        limpar_tela()
+        mostrar_menu()
+        entrada = input("Escolha uma opção: ")
+
+        # EXTRA 4: Letras no menu (evita erro se o usuário digitar letras ou símbolos)
+        if not entrada.isdigit():
+            print("\nEntrada inválida! Por favor, digite apenas o número da opção.")
+            pausar()
+            continue
+
+        opcao = int(entrada)
+
+        # ----------------------------------------------------------------------
+        # 04. MATCH CASE (Regra de Ouro: cada case apenas chama a função)
+        # ----------------------------------------------------------------------
+        match opcao:
+            case 1:
+                mostrar_saldo(saldo)
+                pausar()
+            case 2:
+                saldo = depositar(saldo, extrato)
+                pausar()
+            case 3:
+                saldo = sacar(saldo, extrato)
+                pausar()
+            case 4:
+                mostrar_extrato(extrato, saldo)
+                pausar()
+            case 0:
+                print("\nObrigado por utilizar o Banco Cofrinho. Até logo!")
+            case _:
+                print("\nOpção inválida! Tente novamente.")
+                pausar()
